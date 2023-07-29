@@ -45,6 +45,8 @@ void reset_notification(struct mako_notification *notif) {
 
 	free(notif->app_name);
 	free(notif->app_icon);
+	free(notif->sound_file);
+	free(notif->sound_name);
 	free(notif->summary);
 	free(notif->body);
 	free(notif->category);
@@ -57,6 +59,8 @@ void reset_notification(struct mako_notification *notif) {
 
 	notif->app_name = strdup("");
 	notif->app_icon = strdup("");
+	notif->sound_file = strdup("");
+	notif->sound_name = strdup("");
 	notif->summary = strdup("");
 	notif->body = strdup("");
 	notif->category = strdup("");
@@ -97,6 +101,8 @@ void destroy_notification(struct mako_notification *notif) {
 
 	free(notif->app_name);
 	free(notif->app_icon);
+	free(notif->sound_file);
+	free(notif->sound_name);
 	free(notif->summary);
 	free(notif->body);
 	free(notif->category);

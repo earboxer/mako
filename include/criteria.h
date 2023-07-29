@@ -36,6 +36,7 @@ struct mako_criteria {
 	enum mako_notification_urgency urgency;
 	struct mako_condition category;
 	struct mako_condition desktop_entry;
+	struct mako_condition sound_name;
 	struct mako_condition summary;
 	struct mako_condition body;
 
