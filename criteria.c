@@ -53,6 +53,7 @@ void destroy_criteria(struct mako_criteria *criteria) {
 	free_cond(&criteria->app_icon);
 	free_cond(&criteria->category);
 	free_cond(&criteria->desktop_entry);
+	free_cond(&criteria->sound_file);
 	free_cond(&criteria->sound_name);
 	free_cond(&criteria->summary);
 	free_cond(&criteria->body);
@@ -140,6 +141,11 @@ bool match_criteria(struct mako_criteria *criteria,
 
 	if (spec.desktop_entry &&
 			!match_condition(&criteria->desktop_entry, notif->desktop_entry)) {
+		return false;
+	}
+
+	if (spec.sound_file &&
+			!match_condition(&criteria->sound_file, notif->sound_file)) {
 		return false;
 	}
 
@@ -370,6 +376,9 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 	} else if (strcmp(key, "desktop-entry") == 0) {
 		criteria->spec.desktop_entry = true;
 		return assign_condition(&criteria->desktop_entry, op, value);
+	} else if (strcmp(key, "sound-file") == 0) {
+		criteria->spec.sound_file = true;
+		return assign_condition(&criteria->sound_file, op, value);
 	} else if (strcmp(key, "sound-name") == 0) {
 		criteria->spec.sound_name = true;
 		return assign_condition(&criteria->sound_name, op, value);
