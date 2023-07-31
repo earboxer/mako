@@ -312,7 +312,6 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 	enum operator op = OP_EQUALS;
 	char *key = token;
 	char *value = strstr(key, "=");
-	bool bare_key = !value;
 
 	if (*key == '\0') {
 		return true;
@@ -350,8 +349,7 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 	// Otherwise, anything is fair game. This helps to return a better error
 	// message.
 
-	// String fields can have bare_key, or not bare_key
-
+	// String fields that support all operators
 	if (strcmp(key, "app-name") == 0) {
 		criteria->spec.app_name = true;
 		return assign_condition(&criteria->app_name, op, value);
@@ -370,7 +368,7 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 	} else if (strcmp(key, "body") == 0) {
 		criteria->spec.body = true;
 		return assign_condition(&criteria->body, op, value);
-	} else if (!bare_key) {
+	} else if (op == OP_EQUALS) {
 		if (strcmp(key, "urgency") == 0) {
 			if (!parse_urgency(value, &criteria->urgency)) {
 				fprintf(stderr, "Invalid urgency value '%s'", value);
@@ -400,6 +398,15 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 			// Anything left must be one of the boolean fields, defined using
 			// standard syntax. Continue on.
 		}
+	}
+
+	if (op == OP_REGEX_MATCHES) {
+		fprintf(stderr, "Invalid criteria field/operator '%s~='\n", key);
+		return false;
+	} else if (op == OP_NOT_EQUALS) {
+		// TODO: Support != for boolean fields.
+		fprintf(stderr, "Invalid criteria field/operator '%s!='\n", key);
+		return false;
 	}
 
 	if (strcmp(key, "actionable") == 0) {
@@ -435,11 +442,7 @@ bool apply_criteria_field(struct mako_criteria *criteria, char *token) {
 		criteria->spec.hidden = true;
 		return true;
 	} else {
-		if (bare_key) {
-			fprintf(stderr, "Invalid boolean criteria field '%s'\n", key);
-		} else {
-			fprintf(stderr, "Invalid criteria field '%s'\n", key);
-		}
+		fprintf(stderr, "Invalid criteria field '%s'\n", key);
 		return false;
 	}
 
